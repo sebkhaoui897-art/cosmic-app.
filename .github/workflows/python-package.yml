@@ -11,35 +11,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Build with Buildozer Action
+        uses: ArtemSidorov/buildozer-action@v1
         with:
-          python-version: '3.10'
-
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev
-          pip install --upgrade pip
-          pip install --upgrade Cython==0.29.36 buildozer kivy
-
-      - name: Build APK with Buildozer
-        run: |
-          buildozer init
-          sed -i 's/^title = .*/title = Cosmic Guide/' buildozer.spec
-          sed -i 's/^package.name = .*/package.name = cosmicguide/' buildozer.spec
-          sed -i 's/^package.domain = .*/package.domain = org.cosmic/' buildozer.spec
-          sed -i 's/^source.include_exts = .*/source.include_exts = py/' buildozer.spec
-          sed -i 's/^requirements = .*/requirements = python3==3.11.5,kivy/' buildozer.spec
-          sed -i 's/#android.archs =.*/android.archs = arm64-v8a/' buildozer.spec
-          sed -i 's/#android.api =.*/android.api = 33/' buildozer.spec
-          sed -i 's/#android.minapi =.*/android.minapi = 21/' buildozer.spec
-          sed -i 's/#android.accept_sdk_license =.*/android.accept_sdk_license = True/' buildozer.spec
-          yes | buildozer -v android debug
+          command: buildozer -v android debug
+          repository_root: .
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: package
           path: bin/*.apk
-  
+ 
