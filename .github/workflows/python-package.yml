@@ -23,8 +23,10 @@ jobs:
           pip install --upgrade pip
           pip install --upgrade Cython==0.29.36 buildozer kivy
 
-      - name: Generate Buildozer Spec
+      - name: Accept Android SDK Licenses & Prep Buildozer
         run: |
+          mkdir -p ~/.android
+          touch ~/.android/repositories.cfg
           buildozer init
           sed -i 's/^title = .*/title = Cosmic Guide/' buildozer.spec
           sed -i 's/^package.name = .*/package.name = cosmicguide/' buildozer.spec
@@ -36,11 +38,12 @@ jobs:
           sed -i 's/#android.accept_sdk_license =.*/android.accept_sdk_license = True/' buildozer.spec
 
       - name: Build APK with Buildozer
-        run: buildozer -v android debug
+        run: |
+          yes | buildozer -v android debug || true
+          buildozer -v android debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: package
           path: bin/*.apk
- 
